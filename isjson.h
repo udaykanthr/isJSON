@@ -4,7 +4,7 @@
 #define BUFFSIZE 300
 char json_string[BUFFSIZE];
 
-
+void flush();
 int buildJSONString(char c);
 char* getBuffer();
 
