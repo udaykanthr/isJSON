@@ -1,15 +1,14 @@
 #include "isjson.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-char pc;
-char parser[50];
-int p =0;
-int json_len = 0;
-int isClear = 0;
+uint8_t pc;
+uint8_t parser[50];
+uint8_t p =0;
+uint8_t json_len = 0;
+uint8_t isClear = 0;
 
-void push(char c) {
+void push(uint8_t c) {
   json_len++;
   json_string[json_len-1] = c;
   pc = c;
@@ -22,51 +21,13 @@ void flush() {
   isClear = 0;
 }
 
-int buildJSONString(char c) {
+uint8_t buildJSONString(uint8_t c) {
 
   if (isClear) {
     flush();
   }
-  int isJ = 0;
-  if (p > 1 && json_len > 0 && parser[p-1] != '"' && c ==  ' ')
-    {
-      return 0; // Ignore spaces in between seepcial chars.
-    }
-  else if (json_len == 0 && c == '{') {
-    push(c);
-    p++;
-    parser[p-1] = c;
-  } else if (json_len == 1 && c == '"') {
-    push(c);
-    p++;
-    parser[p-1] = c;
-  } else if(json_len == 1 && c != '"') {
-    flush();
-  } else if (p >= 1 && c != '"' && parser[p-1] == '[') {
-    flush();
-  } else if (p >= 1 && c == ']' && parser[p-1] == '[') {
-    push(c);
-    p--;
-  } else if (p >= 1 && (c == '"' || c == '[' || c == '{') && parser[p-1] == ':') {
-    push(c);
-    parser[p-1] = c;     
-  } else if (p >= 1 && !(c == '"' || c == '[' || c == '{') && parser[p-1] == ':') {
-    flush();
-  } else if (p >= 1 && c == '"' && parser[p-1] == ',') {
-    push(c);
-    parser[p-1] = c;     
-  } else if (p >= 1 && c != '"' && parser[p-1] == ',') {
-    flush();
-  } else if (p >= 1 && (c == '{' || c == ':' || c == ',') && parser[p-1] != '"') {
-    push(c);
-    p++;
-    parser[p-1] = c;
-  } else if (p >= 1 && c != '"' && parser[p-1] == '"') {
-    push(c);
-  } else if (p >= 1 && c == '"' && parser[p-1] == '"') {
-    push(c);
-    p--;
-  } else if (p >= 1 && c == '"' && parser[p-1] != '"') {
+  uint8_t isJ = 0;
+  if (c == '{') {
     push(c);
     p++;
     parser[p-1] = c;
@@ -77,22 +38,14 @@ int buildJSONString(char c) {
     push(c);
   }
 
-  // JSON in buffer is valid
+  // JSON detected.
   if (json_len > 0 && p == 0) {
     isJ = 1;
   }
   return isJ;
 }
 
-char* getBuffer() {
-  /* char *buff; */
-  /* buff = malloc(json_len+1); */
-  /* if (buff != NULL ) { */
-  /*   strlcpy(buff, json_string, json_len+1); */
-  /*   p =0; */
-  /*   json_len = 0; */
-  /*   pc = ' '; */
-  /* } */
+uint8_t* getBuffer() {
   isClear = 1;
   return json_string;
 }
